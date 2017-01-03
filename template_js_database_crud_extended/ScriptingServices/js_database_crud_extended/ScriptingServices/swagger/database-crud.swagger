@@ -13,7 +13,7 @@
       }
     ],
     "paths": {
-        "/js/${packageName}/${fileName}": {
+        "/js/${packageName}/swagger/${fileName}": {
             "get": {
             	"tags":[
                		"${entityName}"
