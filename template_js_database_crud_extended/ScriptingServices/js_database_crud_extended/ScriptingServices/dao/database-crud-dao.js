@@ -122,13 +122,14 @@ exports.update = function(entity) {
     var connection = datasource.getConnection();
     try {
         var sql = 'UPDATE ${tableName} SET ##
-#foreach ($tableColumn in $tableColumnsWithoutKeys)#if ($velocityCount > 1),#end${tableColumn.name} = ?#end
+#foreach ($tableColumn in $tableColumns)#if($addComma == true),#end #if($tableColumn.primaryKey == false)#set($addComma = true)${tableColumn.name} = ?#end#end
 #foreach ($tableColumn in $tableColumns)#if ($tableColumn.primaryKey == true) WHERE ${tableColumn.name} = ?';
 #end
 #end
         var statement = connection.prepareStatement(sql);
         var i = 0;
-#foreach ($tableColumn in $tableColumnsWithoutKeys)
+#foreach ($tableColumn in $tableColumns)
+#if ($tableColumn.primaryKey == false)
 #if ($tableColumn.type == $INTEGER)
         statement.setInt(++i, entity.${tableColumn.name.toLowerCase()});
 #elseif ($tableColumn.type == $VARCHAR)
@@ -168,10 +169,10 @@ exports.update = function(entity) {
     // not supported type: responseBody.${tableColumn.name.toLowerCase()}
 #end
 #end
+#end
 #foreach ($tableColumn in $tableColumns)
 #if ($tableColumn.primaryKey == true)
-        var id = entity.${tableColumn.name.toLowerCase()};
-        statement.setInt(++i, id);
+        statement.setInt(++i, entity.${tableColumn.name.toLowerCase()});
 #end
 #end
 		${fileNameNoExtension}DaoExtensionsUtils.beforeUpdate(connection, entity);
