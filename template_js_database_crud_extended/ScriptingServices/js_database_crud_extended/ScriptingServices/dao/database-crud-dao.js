@@ -15,7 +15,7 @@ exports.create = function(entity) {
         var statement = connection.prepareStatement(sql);
         var i = 0;
 #foreach ($tableColumn in $tableColumns)
-#if ($tableColumn.key == true)
+#if ($tableColumn.key)
         var id = datasource.getSequence('${tableName}_${tableColumn.name}').next();
         statement.setInt(++i, id);
 #else    
@@ -73,7 +73,7 @@ exports.get = function(id) {
 	var entity = null;
     var connection = datasource.getConnection();
     try {
-        var sql = 'SELECT * FROM ${tableName} WHERE #foreach ($tableColumn in $tableColumns)#if ($tableColumn.key == true)${tableColumn.name}#end#end = ?';
+        var sql = 'SELECT * FROM ${tableName} WHERE #foreach ($tableColumn in $tableColumns)#if ($tableColumn.key)${tableColumn.name}#end#end = ?';
         var statement = connection.prepareStatement(sql);
         statement.setInt(1, id);
 
@@ -123,7 +123,7 @@ exports.update = function(entity) {
     try {
         var sql = 'UPDATE ${tableName} SET ##
 #foreach ($tableColumn in $tableColumns)#if($addComma == true),#end #if($tableColumn.key == false)#set($addComma = true)${tableColumn.name} = ?#end#end
-#foreach ($tableColumn in $tableColumns)#if ($tableColumn.key == true) WHERE ${tableColumn.name} = ?';
+#foreach ($tableColumn in $tableColumns)#if ($tableColumn.key) WHERE ${tableColumn.name} = ?';
 #end
 #end
         var statement = connection.prepareStatement(sql);
@@ -171,7 +171,7 @@ exports.update = function(entity) {
 #end
 #end
 #foreach ($tableColumn in $tableColumns)
-#if ($tableColumn.key == true)
+#if ($tableColumn.key)
         statement.setInt(++i, entity.${tableColumn.name.toLowerCase()});
 #end
 #end
@@ -187,9 +187,9 @@ exports.update = function(entity) {
 exports.delete = function(entity) {
     var connection = datasource.getConnection();
     try {
-    	var sql = 'DELETE FROM ${tableName} WHERE #foreach ($tableColumn in $tableColumns)#if ($tableColumn.key == true)${tableColumn.name}#end#end = ?';
+    	var sql = 'DELETE FROM ${tableName} WHERE #foreach ($tableColumn in $tableColumns)#if ($tableColumn.key)${tableColumn.name}#end#end = ?';
         var statement = connection.prepareStatement(sql);
-        statement.setString(1, entity.#foreach ($tableColumn in $tableColumns)#if ($tableColumn.key == true)${tableColumn.name.toLowerCase()}#end#end);
+        statement.setString(1, entity.#foreach ($tableColumn in $tableColumns)#if ($tableColumn.key)${tableColumn.name.toLowerCase()}#end#end);
         ${fileNameNoExtension}DaoExtensionsUtils.beforeDelete(connection, entity);
         statement.executeUpdate();
         ${fileNameNoExtension}DaoExtensionsUtils.afterDelete(connection, entity);
@@ -224,50 +224,50 @@ exports.metadata = function() {
 #foreach ($tableColumn in $tableColumns)
 		{
 			name: '$tableColumn.name.toLowerCase()',
-#if ($tableColumn.type == $INTEGER && $tableColumn.key == true)
+#if ($tableColumn.type == $INTEGER && $tableColumn.key)
 			type: 'integer',
 #elseif ($tableColumn.type == $INTEGER)
 			type: 'integer'
-#elseif ($tableColumn.type == $VARCHAR && $tableColumn.key == true)
+#elseif ($tableColumn.type == $VARCHAR && $tableColumn.key)
     		type: 'string',
 #elseif ($tableColumn.type == $VARCHAR)
 			type: 'string'
-#elseif ($tableColumn.type == $CHAR && $tableColumn.key == true)
+#elseif ($tableColumn.type == $CHAR && $tableColumn.key)
 			type: 'string',
 #elseif ($tableColumn.type == $CHAR)
 			type: 'string'
-#elseif ($tableColumn.type == $BIGINT && $tableColumn.key == true)
+#elseif ($tableColumn.type == $BIGINT && $tableColumn.key)
 			type: 'bigint',
 #elseif ($tableColumn.type == $BIGINT)
 			type: 'bigint'
-#elseif ($tableColumn.type == $SMALLINT && $tableColumn.key == true)
+#elseif ($tableColumn.type == $SMALLINT && $tableColumn.key)
 			type: 'smallint',
 #elseif ($tableColumn.type == $SMALLINT)
 			type: 'smallint'
-#elseif ($tableColumn.type == $FLOAT && $tableColumn.key == true)
+#elseif ($tableColumn.type == $FLOAT && $tableColumn.key)
 			type: 'float',
 #elseif ($tableColumn.type == $FLOAT)
 			type: 'float'
-#elseif ($tableColumn.type == $DOUBLE && $tableColumn.key == true)
+#elseif ($tableColumn.type == $DOUBLE && $tableColumn.key)
 			type: 'double',
 #elseif ($tableColumn.type == $DOUBLE)
 			type: 'double'
-#elseif ($tableColumn.type == $DATE && $tableColumn.key == true)
+#elseif ($tableColumn.type == $DATE && $tableColumn.key)
 			type: 'date',
 #elseif ($tableColumn.type == $DATE)
 			type: 'date'
-#elseif ($tableColumn.type == $TIME && $tableColumn.key == true)
+#elseif ($tableColumn.type == $TIME && $tableColumn.key)
 			type: 'time',
 #elseif ($tableColumn.type == $TIME)
 			type: 'time'
-#elseif ($tableColumn.type == $TIMESTAMP && $tableColumn.key == true)
+#elseif ($tableColumn.type == $TIMESTAMP && $tableColumn.key)
 			type: 'timestamp',
 #elseif ($tableColumn.type == $TIMESTAMP)
 			type: 'timestamp'
 #else
  			type: 'unknown',
 #end
-#if ($tableColumn.key == true)
+#if ($tableColumn.key)
 			key: 'true',
 			required: 'true'
 #end
